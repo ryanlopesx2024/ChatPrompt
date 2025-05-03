@@ -356,6 +356,7 @@ export default function ChatDetailPage({ params }: { params: { id: string } }) {
                       const threadId = localStorage.getItem(`thread_id_${chatId}`) || undefined;
                       
                       // Enviar mensagem com anexo usando o módulo de API
+                      // Usar sendChatMessage com parâmetros adicionais para anexos
                       const chatResponse = await fetch(`${API_URL}/chat`, {
                         method: 'POST',
                         headers: {
