@@ -26,7 +26,20 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["*"],
 )
+
+# Rota OPTIONS para preflight requests (CORS)
+@app.options("/{path:path}")
+async def options_route(path: str):
+    return JSONResponse(
+        content={"message": "CORS preflight request successful"},
+        headers={
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+            "Access-Control-Allow-Headers": "Content-Type, Authorization",
+        }
+    )
 
 # Models
 class LoginRequest(BaseModel):

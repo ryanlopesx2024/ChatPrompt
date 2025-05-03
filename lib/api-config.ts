@@ -28,9 +28,10 @@ export const isBackendAvailable = async (): Promise<boolean> => {
       },
     });
     
-    // Aceita 200 OK ou 404 Not Found como sinais de que o servidor está rodando
-    // (404 pode acontecer se o endpoint não suporta OPTIONS mas o servidor está online)
-    return response.ok || response.status === 404;
+    // Aceita 200 OK, 404 Not Found ou 405 Method Not Allowed como sinais de que o servidor está rodando
+    // (404 pode acontecer se o endpoint não existe, 405 se o método OPTIONS não é suportado)
+    return response.ok || response.status === 404 || response.status === 405;
+    
   } catch (error) {
     console.warn('Backend não disponível, usando dados mockados:', error);
     return false;
