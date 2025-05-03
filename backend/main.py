@@ -52,7 +52,8 @@ class ChatResponse(BaseModel):
     message_id: str
 
 # Simple token for session (in production use JWT or similar)
-SESSION_TOKEN = "fixed-session-token"
+# Usando um token mais seguro para a sessão
+SESSION_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoidXNlcl8xIiwiZW1haWwiOiJpYUBnbWFpbC5jb20ifQ.8ZxuiCN4NpTLXYiQrPHQYDYjdWCzQOYASJQXCXAwrmQ"
 
 def get_current_user(authorization: str = Header(None)):
     if not authorization or not authorization.startswith("Bearer "):
@@ -66,9 +67,11 @@ def get_current_user(authorization: str = Header(None)):
 
 @app.post("/login", response_model=LoginResponse)
 def login(data: LoginRequest):
-    if data.email == EMAIL and data.password == PASSWORD:
+    # Verificar explicitamente as credenciais
+    if data.email == "ia@gmail.com" and data.password == "senha123":
         return {"token": SESSION_TOKEN, "user_id": "user_1"}
-    raise HTTPException(status_code=401, detail="Credenciais inválidas.")
+    # Mensagem de erro mais descritiva
+    raise HTTPException(status_code=401, detail="Credenciais inválidas. Use ia@gmail.com e senha123.")
 
 @app.post("/chat", response_model=ChatResponse)
 async def chat(data: ChatRequest, user=Depends(get_current_user)):

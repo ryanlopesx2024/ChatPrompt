@@ -54,6 +54,11 @@ export default function LoginPage() {
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold">Prompt Engenheiro Assistante</CardTitle>
           <CardDescription>Entre com suas credenciais para acessar</CardDescription>
+          <div className="mt-2 p-2 bg-gray-100 rounded-md text-sm">
+            <p><strong>Credenciais de acesso:</strong></p>
+            <p>Email: <code>ia@gmail.com</code></p>
+            <p>Senha: <code>senha123</code></p>
+          </div>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleLogin} className="space-y-4">
@@ -67,6 +72,7 @@ export default function LoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="ia@gmail.com"
+                defaultValue="ia@gmail.com"
                 required
               />
             </div>
@@ -78,6 +84,8 @@ export default function LoginPage() {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                defaultValue="senha123"
+                placeholder="senha123"
                 required
               />
             </div>
