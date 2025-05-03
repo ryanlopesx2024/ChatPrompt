@@ -2,18 +2,35 @@
 // Altere esta URL quando implantar o backend no Railway
 export const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
+// Função para normalizar URLs e evitar barras duplas
+export const normalizeUrl = (baseUrl: string, path: string): string => {
+  // Remove barras do final da baseUrl
+  const cleanBaseUrl = baseUrl.replace(/\/*$/, '');
+  // Remove barras do início do path
+  const cleanPath = path.replace(/^\/+/, '');
+  // Junta com uma única barra
+  return `${cleanBaseUrl}/${cleanPath}`;
+};
+
 // Verificar se o backend está disponível
 export const isBackendAvailable = async (): Promise<boolean> => {
   try {
     // Tenta fazer uma requisição OPTIONS para verificar se o backend está respondendo
-    const response = await fetch(`${API_URL}/login`, {
+    // Usa a função normalizeUrl para evitar barras duplas
+    const loginUrl = normalizeUrl(API_URL, 'login');
+    console.log('Verificando disponibilidade do backend em:', loginUrl);
+    
+    const response = await fetch(loginUrl, {
       method: 'OPTIONS',
       mode: 'cors',
       headers: {
         'Content-Type': 'application/json',
       },
     });
-    return response.ok;
+    
+    // Aceita 200 OK ou 404 Not Found como sinais de que o servidor está rodando
+    // (404 pode acontecer se o endpoint não suporta OPTIONS mas o servidor está online)
+    return response.ok || response.status === 404;
   } catch (error) {
     console.warn('Backend não disponível, usando dados mockados:', error);
     return false;
@@ -33,7 +50,10 @@ export async function loginUser(email: string, password: string) {
   
   if (backendAvailable) {
     try {
-      const response = await fetch(`${API_URL}/login`, {
+      const loginUrl = normalizeUrl(API_URL, 'login');
+      console.log('Fazendo login em:', loginUrl);
+      
+      const response = await fetch(loginUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -69,7 +89,10 @@ export async function sendChatMessage(message: string, threadId?: string, token?
   
   if (backendAvailable) {
     try {
-      const response = await fetch(`${API_URL}/chat`, {
+      const chatUrl = normalizeUrl(API_URL, 'chat');
+      console.log('Enviando mensagem para:', chatUrl);
+      
+      const response = await fetch(chatUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -116,7 +139,10 @@ export async function uploadAttachment(file: File, token: string) {
       const formData = new FormData();
       formData.append("file", file);
       
-      const response = await fetch(`${API_URL}/attachments`, {
+      const attachmentsUrl = normalizeUrl(API_URL, 'attachments');
+      console.log('Enviando arquivo para:', attachmentsUrl);
+      
+      const response = await fetch(attachmentsUrl, {
         method: "POST",
         headers: {
           "Authorization": `Bearer ${token}`,

@@ -11,7 +11,7 @@ import { Send, Paperclip } from "lucide-react"
 import ChatSidebar from "@/components/chat-sidebar"
 import ChatMessage from "@/components/chat-message"
 import { cn } from "@/lib/utils"
-import { API_URL, sendChatMessage, uploadAttachment } from "@/lib/api-config"
+import { API_URL, sendChatMessage, uploadAttachment, normalizeUrl } from "@/lib/api-config"
 
 type Message = {
   id: number
@@ -357,7 +357,10 @@ export default function ChatDetailPage({ params }: { params: { id: string } }) {
                       
                       // Enviar mensagem com anexo usando o módulo de API
                       // Usar sendChatMessage com parâmetros adicionais para anexos
-                      const chatResponse = await fetch(`${API_URL}/chat`, {
+                      const chatUrl = normalizeUrl(API_URL, 'chat');
+                      console.log('Enviando mensagem com anexo para:', chatUrl);
+                      
+                      const chatResponse = await fetch(chatUrl, {
                         method: 'POST',
                         headers: {
                           'Content-Type': 'application/json',
