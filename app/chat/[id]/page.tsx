@@ -118,7 +118,11 @@ export default function ChatDetailPage({ params }: { params: { id: string } }) {
         // Verificar se há flag para envio automático
         const shouldAutoSend = localStorage.getItem(`auto_send_${chatId}`) === "true"
         
-        if (shouldAutoSend && messagesWithDates.length > 0 && messagesWithDates[0].isUser) {
+        // Verificar se a última mensagem já é do assistente (para evitar duplicação)
+        const lastMessage = messagesWithDates[messagesWithDates.length - 1]
+        const hasAssistantResponse = !lastMessage.isUser
+        
+        if (shouldAutoSend && messagesWithDates.length > 0 && messagesWithDates[0].isUser && !hasAssistantResponse) {
           // Esperar um pouco para garantir que o login foi concluído
           setTimeout(() => {
             sendMessageAutomatically(messagesWithDates[0].content)
@@ -142,6 +146,9 @@ export default function ChatDetailPage({ params }: { params: { id: string } }) {
           }
           setMessages([userPromptMessage])
           localStorage.setItem(`messages_${chatId}`, JSON.stringify([userPromptMessage]))
+          
+          // Definir flag para envio automático
+          localStorage.setItem(`auto_send_${chatId}`, "true")
           
           // Enviar a mensagem automaticamente
           setTimeout(() => {
