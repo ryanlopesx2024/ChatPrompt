@@ -8,10 +8,11 @@ from typing import Optional, List, Dict, Any, Union
 from openai import OpenAI
 
 # Config
-OPENAI_API_KEY = "your_api_key_here"
-OPENAI_ASSISTANT_ID = "asst_HHmkXbvR6zQbqSPkayEJhxgL"
-EMAIL = "ia@gmail.com"
-PASSWORD = "senha123"
+# Use environment variables for sensitive information
+OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "your_api_key_here")
+OPENAI_ASSISTANT_ID = os.environ.get("OPENAI_ASSISTANT_ID", "your_assistant_id_here")
+EMAIL = os.environ.get("APP_EMAIL", "ia@gmail.com")
+PASSWORD = os.environ.get("APP_PASSWORD", "senha123")
 
 # Initialize OpenAI client
 client = OpenAI(api_key=OPENAI_API_KEY)
