@@ -11,6 +11,7 @@ import { Send, Paperclip } from "lucide-react"
 import ChatSidebar from "@/components/chat-sidebar"
 import ChatMessage from "@/components/chat-message"
 import { cn } from "@/lib/utils"
+import { API_URL, sendChatMessage, uploadAttachment } from "@/lib/api-config"
 
 type Message = {
   id: number
@@ -50,24 +51,9 @@ export default function ChatDetailPage({ params }: { params: { id: string } }) {
         throw new Error('Não autenticado')
       }
 
-      // Enviar mensagem para o backend
-      const response = await fetch('http://localhost:8000/chat', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          message: messageContent,
-          thread_id: localStorage.getItem(`thread_id_${chatId}`) || undefined
-        })
-      })
-
-      if (!response.ok) {
-        throw new Error(`Erro na API: ${response.status}`)
-      }
-
-      const data = await response.json()
+      // Enviar mensagem para o backend usando o módulo de API
+      const threadId = localStorage.getItem(`thread_id_${chatId}`) || undefined
+      const data = await sendChatMessage(messageContent, threadId, token)
       
       // Salvar thread_id para uso futuro
       localStorage.setItem(`thread_id_${chatId}`, data.thread_id)
@@ -197,24 +183,9 @@ export default function ChatDetailPage({ params }: { params: { id: string } }) {
         throw new Error('Não autenticado')
       }
 
-      // Enviar mensagem para o backend
-      const response = await fetch('http://localhost:8000/chat', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          message: userMessage.content,
-          thread_id: localStorage.getItem(`thread_id_${chatId}`) || undefined
-        })
-      })
-
-      if (!response.ok) {
-        throw new Error(`Erro na API: ${response.status}`)
-      }
-
-      const data = await response.json()
+      // Enviar mensagem para o backend usando o módulo de API
+      const threadId = localStorage.getItem(`thread_id_${chatId}`) || undefined
+      const data = await sendChatMessage(userMessage.content, threadId, token)
       
       // Salvar thread_id para uso futuro
       localStorage.setItem(`thread_id_${chatId}`, data.thread_id)
@@ -251,23 +222,26 @@ export default function ChatDetailPage({ params }: { params: { id: string } }) {
         return
       }
 
-      const response = await fetch('http://localhost:8000/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          email: 'ia@gmail.com',
-          password: 'senha123'
+      // Fazer login com o backend usando o módulo de API
+      try {
+        const data = await fetch('/api/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            email: 'ia@gmail.com',
+            password: 'senha123'
+          })
+        }).then(res => {
+          if (!res.ok) throw new Error('Falha no login')
+          return res.json()
         })
-      })
-
-      if (!response.ok) {
-        throw new Error('Falha no login')
+        
+        localStorage.setItem('authToken', data.token)
+      } catch (error) {
+        console.error('Erro no login:', error)
       }
-
-      const data = await response.json()
-      localStorage.setItem('authToken', data.token)
     } catch (error) {
       console.error('Erro no login:', error)
     }
@@ -359,14 +333,8 @@ export default function ChatDetailPage({ params }: { params: { id: string } }) {
                       const formData = new FormData();
                       formData.append('file', file);
                       
-                      // Enviar arquivo para o backend
-                      const response = await fetch('http://localhost:8000/attachments', {
-                        method: 'POST',
-                        headers: {
-                          'Authorization': `Bearer ${token}`
-                        },
-                        body: formData
-                      });
+                      // Enviar arquivo para o backend usando o módulo de API
+                      const response = await uploadAttachment(file, token);
                       
                       if (!response.ok) {
                         throw new Error(`Erro no upload: ${response.status}`);
@@ -387,7 +355,8 @@ export default function ChatDetailPage({ params }: { params: { id: string } }) {
                       // Enviar mensagem com o arquivo anexado
                       const threadId = localStorage.getItem(`thread_id_${chatId}`) || undefined;
                       
-                      const chatResponse = await fetch('http://localhost:8000/chat', {
+                      // Enviar mensagem com anexo usando o módulo de API
+                      const chatResponse = await fetch(`${API_URL}/chat`, {
                         method: 'POST',
                         headers: {
                           'Content-Type': 'application/json',

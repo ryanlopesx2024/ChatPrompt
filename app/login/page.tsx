@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { useRouter } from "next/navigation"
+import { loginUser } from "@/lib/api-config"
 
 export default function LoginPage() {
   const router = useRouter()
@@ -20,20 +21,8 @@ export default function LoginPage() {
     setError("")
 
     try {
-      // Fazer login com o backend
-      const response = await fetch("http://localhost:8000/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      })
-
-      if (!response.ok) {
-        throw new Error("Credenciais inválidas")
-      }
-
-      const data = await response.json()
+      // Usar a função de login do módulo de API
+      const data = await loginUser(email, password)
       
       // Salvar token no localStorage
       localStorage.setItem("authToken", data.token)
